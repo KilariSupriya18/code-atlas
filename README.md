@@ -1,4 +1,4 @@
-# CodeMentor — Codebase RAG & Adaptive Onboarding Platform
+# CodeAtlas — Codebase RAG & Adaptive Onboarding Platform
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
@@ -6,7 +6,7 @@
 [![Qdrant](https://img.shields.io/badge/Vector_DB-Qdrant-DC2626.svg)](https://qdrant.tech/)
 [![Groq](https://img.shields.io/badge/LLM-Groq_LPU-F55036.svg)](https://groq.com/)
 
-CodeMentor is a developer onboarding platform designed to solve the codebase comprehension challenge. It ingests public Git repositories, parses raw code files into function-level and class-level semantic chunks using AST & Tree-sitter, computes dense vector embeddings using local Sentence Transformers, stores them in Qdrant, and provides grounded question answering and adaptive learning paths powered by Groq.
+CodeAtlas is a developer onboarding platform designed to solve the codebase comprehension challenge. It ingests public Git repositories, parses raw code files into function-level and class-level semantic chunks using AST & Tree-sitter, computes dense vector embeddings using local Sentence Transformers, stores them in Qdrant, and provides grounded question answering and adaptive learning paths powered by Groq.
 
 ---
 
@@ -111,7 +111,7 @@ Open `http://localhost:5173` in your browser.
 
 1. **Landing Page (`/`)**:
    - Click **"Explore Demo"** or **"Connect Repository"**.
-   - CodeMentor automatically ingests the realistic sample authentication and payment service (`demo/sample_repo`).
+   - CodeAtlas automatically ingests the realistic sample authentication and payment service (`demo/sample_repo`).
 2. **Live Indexing (`/app/repositories/:id/indexing`)**:
    - Observe live real-time pipeline stages: `queued -> fetching -> parsing -> embedding -> finalizing -> ready`.
    - Real counts for files parsed, functions/classes extracted, and vectors embedded.

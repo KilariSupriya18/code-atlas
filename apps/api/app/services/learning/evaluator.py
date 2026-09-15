@@ -105,7 +105,7 @@ Rules:
             {
                 "role": "system",
                 "content": (
-                    "You are a rigorous code mentor grading an engineer's understanding of source code. "
+                    "You are a rigorous CodeAtlas evaluator and mentor grading an engineer's understanding of source code. "
                     "Grade strictly against the hidden rubric and actual source code."
                 )
             },

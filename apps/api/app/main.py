@@ -10,18 +10,18 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
-logger = logging.getLogger("codementor")
+logger = logging.getLogger("codeatlas")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Initializing CodeMentor backend...")
+    logger.info("Initializing CodeAtlas backend...")
     await init_db()
     logger.info("Database schemas initialized.")
     yield
-    logger.info("Shutting down CodeMentor backend.")
+    logger.info("Shutting down CodeAtlas backend.")
 
 app = FastAPI(
-    title="CodeMentor API",
+    title="CodeAtlas API",
     description="Codebase RAG & Adaptive Onboarding Platform API",
     version="1.0.0",
     lifespan=lifespan

@@ -77,7 +77,7 @@ export const ProgressPage: React.FC = () => {
               Your learning journey starts here
             </h2>
             <p className="text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
-              Complete an exercise in any lesson to see what you understand and what to revisit. As you submit responses, CodeMentor evaluates them against hidden rubrics and builds your competency profile.
+              Complete an exercise in any lesson to see what you understand and what to revisit. As you submit responses, CodeAtlas evaluates them against hidden rubrics and builds your competency profile.
             </p>
           </div>
 

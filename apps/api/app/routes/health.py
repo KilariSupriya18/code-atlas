@@ -8,7 +8,7 @@ router = APIRouter(tags=["Health & Capabilities"])
 async def health_check():
     return {
         "status": "healthy",
-        "service": "codementor-api",
+        "service": "codeatlas-api",
         "version": "1.0.0"
     }
 

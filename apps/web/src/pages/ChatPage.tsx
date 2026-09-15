@@ -212,7 +212,7 @@ export const ChatPage: React.FC = () => {
                 className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-3xl mx-auto w-full`}
               >
                 <div className="text-[12px] font-semibold uppercase tracking-wider text-text-secondary mb-1.5 px-1">
-                  {isUser ? 'You' : 'CodeMentor Assistant'}
+                  {isUser ? 'You' : 'CodeAtlas Assistant'}
                 </div>
 
                 <div
@@ -284,7 +284,7 @@ export const ChatPage: React.FC = () => {
           {sendMutation.isPending && (
             <div className="flex flex-col items-start max-w-3xl mx-auto w-full">
               <div className="text-[12px] font-semibold uppercase tracking-wider text-text-secondary mb-1.5 px-1">
-                CodeMentor Assistant
+                CodeAtlas Assistant
               </div>
               <div className="p-6 rounded-2xl bg-surface border border-border text-[15px] text-text-secondary flex items-center space-x-3 shadow-xs">
                 <Loader2 className="w-5 h-5 animate-spin text-indigo" />

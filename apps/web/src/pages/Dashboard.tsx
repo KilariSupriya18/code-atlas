@@ -79,7 +79,7 @@ export const DashboardPage: React.FC = () => {
               No repositories connected yet
             </h3>
             <p className="text-sm text-text-secondary max-w-sm mx-auto leading-relaxed">
-              Connect a public GitHub repository or index our pre-built Python demo to explore CodeMentor immediately.
+              Connect a public GitHub repository or index our pre-built Python demo to explore CodeAtlas immediately.
             </p>
           </div>
           <div className="flex items-center justify-center gap-3 pt-2">

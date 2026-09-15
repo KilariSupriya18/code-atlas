@@ -90,7 +90,7 @@ export const LearnPathPage: React.FC = () => {
               Define Your Onboarding Goal
             </h2>
             <p className="text-[15px] text-text-secondary mt-1">
-              CodeMentor will retrieve relevant architecture modules and synthesize progressive lessons with evaluation rubrics.
+              CodeAtlas will retrieve relevant architecture modules and synthesize progressive lessons with evaluation rubrics.
             </p>
           </div>
 

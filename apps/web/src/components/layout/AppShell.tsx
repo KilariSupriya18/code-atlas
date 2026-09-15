@@ -57,7 +57,7 @@ export const AppShell: React.FC = () => {
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-text-primary tracking-tight text-[17px] leading-tight">
-              CodeMentor
+              CodeAtlas
             </span>
             <span className="text-[11px] font-mono text-text-secondary tracking-wide">
               developer workspace
@@ -241,7 +241,7 @@ export const AppShell: React.FC = () => {
               </div>
             ) : (
               <span className="font-semibold text-text-primary text-[16px]">
-                CodeMentor Workspace
+                CodeAtlas Workspace
               </span>
             )}
           </div>

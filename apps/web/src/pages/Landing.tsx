@@ -36,10 +36,10 @@ export const LandingPage: React.FC = () => {
       {/* Top Navbar */}
       <header className="h-16 border-b border-border bg-surface/80 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-8 max-w-6xl w-full mx-auto">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-bold text-sm shadow-sm">
-            CM
+          <div className="w-8 h-8 rounded-lg bg-indigo text-white flex items-center justify-center font-bold text-sm shadow-sm">
+            CA
           </div>
-          <span className="font-semibold text-text-primary text-lg tracking-tight">CodeMentor</span>
+          <span className="font-semibold text-text-primary text-lg tracking-tight">CodeAtlas</span>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -161,7 +161,7 @@ export const LandingPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="border-t border-border bg-surface py-6 text-center text-xs text-text-secondary">
-        <p>CodeMentor — Production RAG Codebase Assistant for Fast Developer Onboarding</p>
+        <p>CodeAtlas — Production RAG Codebase Assistant for Fast Developer Onboarding</p>
       </footer>
     </div>
   );
