@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Send,
@@ -11,6 +11,8 @@ import {
   ArrowUpRight,
   AlertCircle,
   ExternalLink,
+  MessageSquare,
+  CornerDownLeft,
 } from 'lucide-react';
 import { api, Citation, ChatThread, ChatMessage } from '../api/client';
 import { CodeViewer } from '../components/code/CodeViewer';
@@ -18,8 +20,10 @@ import { CodeViewer } from '../components/code/CodeViewer';
 export const ChatPage: React.FC = () => {
   const { repoId } = useParams<{ repoId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const executedInitialRef = useRef(false);
 
   const threadId = searchParams.get('threadId');
   const [input, setInput] = useState('');
@@ -55,7 +59,7 @@ export const ChatPage: React.FC = () => {
     enabled: !!threadId,
   });
 
-  // Auto-select or create first thread if none in URL
+  // Auto-select first thread if none in URL
   useEffect(() => {
     if (!threadId && threads && threads.length > 0) {
       setSearchParams({ threadId: threads[0].id });
@@ -72,7 +76,7 @@ export const ChatPage: React.FC = () => {
     mutationFn: async (messageText: string) => {
       let activeTid = threadId;
       if (!activeTid && repoId) {
-        const newThread = await api.createThread(repoId, messageText.slice(0, 40));
+        const newThread = await api.createThread(repoId, messageText.slice(0, 45));
         activeTid = newThread.id;
         setSearchParams({ threadId: newThread.id });
         queryClient.invalidateQueries({ queryKey: ['chat-threads', repoId] });
@@ -93,6 +97,17 @@ export const ChatPage: React.FC = () => {
     sendMutation.mutate(toSend.trim());
   };
 
+  // Wire initial question from Overview page (execute exactly once)
+  useEffect(() => {
+    const initialQ = (location.state as any)?.initialQuestion;
+    if (initialQ && !executedInitialRef.current) {
+      executedInitialRef.current = true;
+      handleSend(initialQ);
+      // Clear location state so back/forward or reload doesn't trigger duplicate submissions
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   const handleCitationClick = async (cit: Citation) => {
     if (!repoId) return;
     setActiveCitation(cit);
@@ -112,65 +127,76 @@ export const ChatPage: React.FC = () => {
     setSearchParams({ threadId: newThread.id });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
     <div className="flex h-full overflow-hidden">
-      {/* Threads Mini Sidebar */}
-      <div className="w-52 border-r border-border bg-surface flex flex-col shrink-0 hidden md:flex">
-        <div className="p-3 border-b border-border">
+      {/* Threads Sidebar (240px) */}
+      <div className="w-60 border-r border-border bg-surface flex flex-col shrink-0 hidden md:flex">
+        <div className="p-3.5 border-b border-border">
           <button
             onClick={handleNewThread}
-            className="w-full py-1.5 px-2.5 text-xs font-medium text-text-primary bg-slate-50 hover:bg-slate-100 border border-border rounded-md transition-colors flex items-center justify-center gap-1"
+            className="w-full h-11 px-3 text-[14px] font-medium text-text-primary bg-slate-50 hover:bg-slate-100 border border-border rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs"
           >
-            <Plus className="w-3.5 h-3.5" />
-            New Question
+            <Plus className="w-4 h-4 text-indigo" />
+            <span>New Conversation</span>
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        <div className="flex-1 overflow-y-auto p-3 space-y-1">
+          <div className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
+            Recent Questions
+          </div>
           {threads?.map((t) => (
             <button
               key={t.id}
               onClick={() => setSearchParams({ threadId: t.id })}
-              className={`w-full text-left px-2.5 py-2 text-xs rounded-md truncate transition-colors ${
+              className={`w-full text-left px-3 h-11 text-[14px] rounded-xl truncate transition-colors flex items-center ${
                 t.id === threadId
-                  ? 'bg-primary-light text-primary font-medium'
+                  ? 'bg-indigo-tint text-indigo font-semibold shadow-xs'
                   : 'text-text-secondary hover:text-text-primary hover:bg-slate-100'
               }`}
             >
-              {t.title || 'Untitled Thread'}
+              <MessageSquare className={`w-4 h-4 mr-2.5 shrink-0 ${t.id === threadId ? 'text-indigo' : 'text-text-secondary/70'}`} />
+              <span className="truncate">{t.title || 'Untitled Thread'}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Main Chat Stream Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-background overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 bg-canvas overflow-hidden">
         {/* Messages Scroll Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
           {(!threadData?.messages || threadData.messages.length === 0) && (
-            <div className="max-w-xl mx-auto py-12 text-center space-y-4">
-              <div className="w-10 h-10 rounded-full bg-primary-light text-primary flex items-center justify-center mx-auto">
-                <Sparkles className="w-5 h-5" />
+            <div className="max-w-2xl mx-auto py-12 text-center space-y-5">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-tint text-indigo flex items-center justify-center mx-auto shadow-xs">
+                <Sparkles className="w-6 h-6" />
               </div>
-              <div>
-                <h2 className="text-sm font-semibold text-text-primary">
-                  Ask anything about the codebase
+              <div className="space-y-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-text-primary tracking-tight">
+                  Find your starting point.
                 </h2>
-                <p className="text-xs text-text-secondary mt-1 max-w-sm mx-auto">
-                  Answers are synthesized by Groq, strictly grounded in Qdrant-retrieved function chunks and verified citations.
+                <p className="text-[16px] text-text-secondary leading-relaxed max-w-lg mx-auto">
+                  Ask any question about control flow, validation rules, or dependencies. Answers are verified against repository source code with exact line citations.
                 </p>
               </div>
 
               {/* Starter chips */}
-              <div className="pt-2 flex flex-col gap-2 max-w-md mx-auto">
+              <div className="pt-3 grid sm:grid-cols-2 gap-2.5 max-w-xl mx-auto">
                 {starterQuestions.map((q) => (
                   <button
                     key={q}
                     onClick={() => handleSend(q)}
-                    className="text-left px-3.5 py-2 rounded-lg bg-surface border border-border hover:border-primary/40 hover:bg-slate-50 text-xs text-text-primary transition-all flex items-center justify-between group"
+                    className="text-left p-4 rounded-xl bg-surface border border-border hover:border-indigo-border hover:bg-indigo-tint/40 text-[14px] text-text-primary font-medium transition-all flex items-center justify-between group shadow-xs"
                   >
                     <span>{q}</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-text-secondary group-hover:text-primary transition-colors shrink-0" />
+                    <ArrowUpRight className="w-4 h-4 text-text-secondary group-hover:text-indigo transition-colors shrink-0 ml-2" />
                   </button>
                 ))}
               </div>
@@ -183,16 +209,16 @@ export const ChatPage: React.FC = () => {
             return (
               <div
                 key={msg.id}
-                className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-2xl mx-auto w-full`}
+                className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} max-w-3xl mx-auto w-full`}
               >
-                <div className="text-[11px] font-medium text-text-secondary mb-1">
+                <div className="text-[12px] font-semibold uppercase tracking-wider text-text-secondary mb-1.5 px-1">
                   {isUser ? 'You' : 'CodeMentor Assistant'}
                 </div>
 
                 <div
-                  className={`p-4 rounded-xl text-xs leading-relaxed space-y-3 shadow-sm ${
+                  className={`p-6 rounded-2xl text-[16px] leading-[1.65] space-y-4 shadow-xs ${
                     isUser
-                      ? 'bg-primary text-white max-w-xl'
+                      ? 'bg-indigo text-white max-w-xl font-medium'
                       : 'bg-surface border border-border text-text-primary w-full'
                   }`}
                 >
@@ -201,21 +227,22 @@ export const ChatPage: React.FC = () => {
 
                   {/* Citation chips */}
                   {!isUser && msg.citations && msg.citations.length > 0 && (
-                    <div className="pt-3 border-t border-border/80">
-                      <div className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider mb-2">
-                        Source Evidence ({msg.citations.length})
+                    <div className="pt-4 border-t border-border/80">
+                      <div className="text-[12px] font-semibold text-text-secondary uppercase tracking-wider mb-2.5">
+                        Verified Source Evidence ({msg.citations.length})
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {msg.citations.map((cit, idx) => (
                           <button
                             key={idx}
                             onClick={() => handleCitationClick(cit)}
-                            className="inline-flex items-center space-x-1 px-2.5 py-1 rounded bg-slate-50 hover:bg-primary-light border border-border hover:border-primary/50 text-text-primary hover:text-primary transition-colors text-[11px] font-mono group"
+                            className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-tint/80 hover:bg-indigo hover:text-white border border-indigo-border/80 text-indigo transition-colors text-[13px] font-mono group shadow-2xs"
+                            title={cit.claim || cit.file_path}
                           >
-                            <FileCode className="w-3 h-3 text-text-secondary group-hover:text-primary" />
-                            <span className="truncate max-w-[160px]">{cit.file_path}</span>
-                            <span className="text-text-secondary">
-                              :{cit.start_line}–{cit.end_line}
+                            <FileCode className="w-3.5 h-3.5 group-hover:text-white shrink-0" />
+                            <span className="truncate max-w-[180px]">{cit.file_path}</span>
+                            <span className="opacity-75">
+                              :L{cit.start_line}–L{cit.end_line}
                             </span>
                           </button>
                         ))}
@@ -225,8 +252,8 @@ export const ChatPage: React.FC = () => {
 
                   {/* Uncertainties note if present */}
                   {!isUser && msg.uncertainties && msg.uncertainties.length > 0 && (
-                    <div className="p-2.5 rounded bg-slate-50 border border-slate-200 text-text-secondary text-[11px] flex items-start gap-2">
-                      <HelpCircle className="w-3.5 h-3.5 text-text-secondary shrink-0 mt-0.5" />
+                    <div className="p-3.5 rounded-xl bg-amber-tint/60 border border-amber-border text-amber text-[13px] flex items-start gap-2.5">
+                      <HelpCircle className="w-4 h-4 text-amber shrink-0 mt-0.5" />
                       <div>
                         <span className="font-semibold">Caveat / Uncertainty: </span>
                         {msg.uncertainties.join(' ')}
@@ -236,14 +263,14 @@ export const ChatPage: React.FC = () => {
 
                   {/* Suggested follow-ups */}
                   {!isUser && msg.suggested_questions && msg.suggested_questions.length > 0 && (
-                    <div className="pt-2 flex flex-wrap gap-1.5">
+                    <div className="pt-2 flex flex-wrap gap-2">
                       {msg.suggested_questions.map((sq, sIdx) => (
                         <button
                           key={sIdx}
                           onClick={() => handleSend(sq)}
-                          className="text-[11px] text-text-secondary hover:text-primary bg-slate-50 hover:bg-primary-light px-2 py-1 rounded border border-border transition-colors"
+                          className="text-[13px] text-text-secondary hover:text-indigo hover:bg-indigo-tint bg-slate-50 px-3 py-1.5 rounded-lg border border-border transition-colors flex items-center gap-1.5"
                         >
-                          → {sq}
+                          <span>→ {sq}</span>
                         </button>
                       ))}
                     </div>
@@ -255,12 +282,12 @@ export const ChatPage: React.FC = () => {
 
           {/* Pending loading indicator */}
           {sendMutation.isPending && (
-            <div className="flex flex-col items-start max-w-2xl mx-auto w-full">
-              <div className="text-[11px] font-medium text-text-secondary mb-1">
+            <div className="flex flex-col items-start max-w-3xl mx-auto w-full">
+              <div className="text-[12px] font-semibold uppercase tracking-wider text-text-secondary mb-1.5 px-1">
                 CodeMentor Assistant
               </div>
-              <div className="p-4 rounded-xl bg-surface border border-border text-xs text-text-secondary flex items-center space-x-2">
-                <Loader2 className="w-4 h-4 animate-spin text-primary" />
+              <div className="p-6 rounded-2xl bg-surface border border-border text-[15px] text-text-secondary flex items-center space-x-3 shadow-xs">
+                <Loader2 className="w-5 h-5 animate-spin text-indigo" />
                 <span>Searching Qdrant, computing RRF fusion, and generating grounded answer...</span>
               </div>
             </div>
@@ -269,34 +296,45 @@ export const ChatPage: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Bar */}
-        <div className="p-4 bg-surface border-t border-border">
+        {/* Input Composer (minimum height ~56px) */}
+        <div className="p-5 bg-surface border-t border-border">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSend();
             }}
-            className="max-w-3xl mx-auto relative flex items-center"
+            className="max-w-3xl mx-auto relative"
           >
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask where logic lives, how errors are handled, or inspect a function..."
-              disabled={sendMutation.isPending}
-              className="w-full pl-4 pr-12 py-2.5 text-xs bg-background border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-text-primary"
-            />
-            <button
-              type="submit"
-              disabled={sendMutation.isPending || !input.trim()}
-              className="absolute right-2 p-1.5 bg-primary text-white hover:bg-primary-hover disabled:opacity-40 rounded-md transition-colors"
-            >
-              {sendMutation.isPending ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Send className="w-3.5 h-3.5" />
-              )}
-            </button>
+            <div className="relative flex items-end border border-border rounded-2xl bg-canvas focus-within:border-indigo focus-within:bg-white focus-within:ring-1 focus-within:ring-indigo transition-all shadow-xs">
+              <textarea
+                rows={1}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask where logic lives, how errors are handled, or inspect a function..."
+                disabled={sendMutation.isPending}
+                className="w-full min-h-[56px] max-h-36 py-3.5 pl-4 pr-28 text-[15px] bg-transparent resize-none focus:outline-none text-text-primary placeholder:text-text-secondary/60 leading-relaxed"
+              />
+              <div className="absolute right-2.5 bottom-2.5 flex items-center space-x-2">
+                <button
+                  type="submit"
+                  disabled={sendMutation.isPending || !input.trim()}
+                  className="h-10 px-4 text-[14px] font-medium text-white bg-indigo hover:bg-indigo-hover disabled:opacity-40 rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+                >
+                  {sendMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Send</span>
+                      <CornerDownLeft className="w-3.5 h-3.5 opacity-70" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+            <div className="text-[12px] text-text-secondary/70 mt-1.5 text-right pr-2">
+              Press <kbd className="font-mono bg-slate-100 px-1 py-0.5 rounded text-[11px]">Enter</kbd> to send, <kbd className="font-mono bg-slate-100 px-1 py-0.5 rounded text-[11px]">Shift+Enter</kbd> for newline
+            </div>
           </form>
         </div>
       </div>

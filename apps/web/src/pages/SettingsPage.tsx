@@ -54,53 +54,65 @@ export const SettingsPage: React.FC = () => {
   const storage = settingsData?.storage;
 
   return (
-    <div className="p-8 max-w-3xl mx-auto space-y-6">
+    <div className="p-6 sm:p-10 max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="pb-4 border-b border-border">
-        <h1 className="text-xl font-bold text-text-primary tracking-tight flex items-center gap-2">
-          <Settings className="w-5 h-5 text-primary" />
-          System Settings & Providers
+      <div className="pb-6 border-b border-border">
+        <div className="text-xs uppercase tracking-wider font-bold text-text-secondary mb-1">
+          SYSTEM CONFIGURATION
+        </div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight flex items-center gap-3">
+          <Settings className="w-6 h-6 text-indigo" />
+          Settings & Providers
         </h1>
-        <p className="text-xs text-text-secondary mt-1">
+        <p className="text-sm text-text-secondary mt-1">
           Inspect generative LLM configuration, local Sentence Transformers, and vector database status.
         </p>
       </div>
 
       {/* Groq Generative Provider Card */}
-      <div className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-border">
-          <div className="flex items-center space-x-2">
-            <Cpu className="w-4 h-4 text-primary" />
-            <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">
-              Generative AI (Groq API)
-            </h3>
+      <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-indigo-tint text-indigo flex items-center justify-center">
+              <Cpu className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-text-primary">
+                Generative AI (Groq API)
+              </h3>
+              <p className="text-xs text-text-secondary">Ultra-low latency inference via Llama 3</p>
+            </div>
           </div>
 
           <div>
             {groq?.configured ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-success-light text-success border border-success-border">
-                <CheckCircle2 className="w-3 h-3 mr-1" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-teal-tint text-teal border border-teal/30">
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
                 Configured ({groq.masked_key})
               </span>
             ) : (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                <AlertCircle className="w-3 h-3 mr-1" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-tint text-amber border border-amber/30">
+                <AlertCircle className="w-3.5 h-3.5 mr-1.5" />
                 Key Required
               </span>
             )}
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-3 text-xs">
-          <div className="p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-[11px] text-text-secondary">Primary Model</span>
-            <div className="font-mono font-semibold text-text-primary mt-0.5">
+        <div className="grid sm:grid-cols-2 gap-3.5 text-sm">
+          <div className="p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-xs uppercase tracking-wider font-bold text-text-secondary block">
+              Primary Model
+            </span>
+            <div className="font-mono font-bold text-text-primary text-sm mt-1">
               {groq?.model || 'llama-3.3-70b-versatile'}
             </div>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-[11px] text-text-secondary">Fallback Model</span>
-            <div className="font-mono font-semibold text-text-primary mt-0.5">
+          <div className="p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-xs uppercase tracking-wider font-bold text-text-secondary block">
+              Fallback Model
+            </span>
+            <div className="font-mono font-bold text-text-primary text-sm mt-1">
               {groq?.fallback_model || 'llama-3.1-8b-instant'}
             </div>
           </div>
@@ -108,44 +120,44 @@ export const SettingsPage: React.FC = () => {
 
         {/* Update Key Form */}
         <form onSubmit={handleSaveKey} className="pt-2 space-y-3">
-          <label className="block text-xs font-medium text-text-primary">
+          <label className="block text-sm font-semibold text-text-primary">
             {groq?.configured ? 'Update Groq API Key' : 'Enter Groq API Key'}
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-2.5">
             <div className="relative flex-1">
-              <Key className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+              <Key className="w-4 h-4 text-text-secondary absolute left-3.5 top-3.5" />
               <input
                 type="password"
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
                 placeholder="gsk_..."
-                className="w-full pl-9 pr-3 py-2 text-xs bg-background border border-border rounded-md focus:outline-none focus:border-primary font-mono text-text-primary"
+                className="w-full pl-10 pr-4 py-3 text-sm bg-surface border border-border rounded-xl focus:outline-none focus:border-indigo focus:ring-2 focus:ring-indigo/20 font-mono text-text-primary transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={updateKeyMutation.isPending || !apiKeyInput.trim()}
-              className="px-4 py-2 text-xs font-medium text-white bg-primary hover:bg-primary-hover disabled:opacity-50 rounded-md transition-colors flex items-center gap-1.5 shrink-0"
+              className="px-5 py-3 text-sm font-semibold text-white bg-indigo hover:bg-indigo-hover disabled:opacity-50 rounded-xl transition-all flex items-center gap-2 shrink-0 shadow-sm"
             >
               {updateKeyMutation.isPending ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Save className="w-3.5 h-3.5" />
+                <Save className="w-4 h-4" />
               )}
               Save & Test
             </button>
           </div>
 
           {successMessage && (
-            <div className="p-2.5 bg-success-light border border-success-border rounded text-xs text-success flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+            <div className="p-3 bg-teal-tint/70 border border-teal/40 rounded-xl text-xs font-semibold text-teal flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" />
               {successMessage}
             </div>
           )}
 
           {errorMessage && (
-            <div className="p-2.5 bg-danger-light border border-danger-border rounded text-xs text-danger flex items-center gap-1.5">
-              <AlertCircle className="w-3.5 h-3.5" />
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs font-semibold text-red-700 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-500" />
               {errorMessage}
             </div>
           )}
@@ -153,30 +165,41 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Embeddings Provider Card */}
-      <div className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-3">
-        <div className="flex items-center space-x-2 pb-3 border-b border-border">
-          <Layers className="w-4 h-4 text-indigo-600" />
-          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">
-            Embeddings Provider (Local)
-          </h3>
+      <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+        <div className="flex items-center gap-2.5 pb-4 border-b border-border">
+          <div className="w-8 h-8 rounded-lg bg-indigo-tint text-indigo flex items-center justify-center">
+            <Layers className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-text-primary">
+              Embeddings Provider (Local)
+            </h3>
+            <p className="text-xs text-text-secondary">On-premise Sentence Transformers embedding engine</p>
+          </div>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-[11px] text-text-secondary">Model</span>
-            <div className="font-mono font-semibold text-text-primary mt-0.5">
+        <div className="grid sm:grid-cols-3 gap-3.5 text-sm">
+          <div className="p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-xs uppercase tracking-wider font-bold text-text-secondary block">
+              Model
+            </span>
+            <div className="font-mono font-bold text-text-primary text-sm mt-1 truncate">
               {embeddings?.model}
             </div>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-[11px] text-text-secondary">Dimensions</span>
-            <div className="font-mono font-semibold text-text-primary mt-0.5">
+          <div className="p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-xs uppercase tracking-wider font-bold text-text-secondary block">
+              Dimensions
+            </span>
+            <div className="font-mono font-bold text-text-primary text-sm mt-1">
               {embeddings?.dimensions} dims
             </div>
           </div>
-          <div className="p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-[11px] text-text-secondary">Max Tokens</span>
-            <div className="font-mono font-semibold text-text-primary mt-0.5">
+          <div className="p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-xs uppercase tracking-wider font-bold text-text-secondary block">
+              Max Tokens
+            </span>
+            <div className="font-mono font-bold text-text-primary text-sm mt-1">
               {embeddings?.max_seq_length} tokens
             </div>
           </div>
@@ -184,24 +207,29 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Vector DB & Relational Storage Card */}
-      <div className="bg-surface border border-border rounded-xl p-6 shadow-sm space-y-3">
-        <div className="flex items-center space-x-2 pb-3 border-b border-border">
-          <Database className="w-4 h-4 text-emerald-600" />
-          <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">
-            Storage & Persistence
-          </h3>
+      <div className="bg-surface border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+        <div className="flex items-center gap-2.5 pb-4 border-b border-border">
+          <div className="w-8 h-8 rounded-lg bg-teal-tint text-teal flex items-center justify-center">
+            <Database className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-text-primary">
+              Storage & Persistence
+            </h3>
+            <p className="text-xs text-text-secondary">Vector collection storage and transactional database</p>
+          </div>
         </div>
 
-        <div className="space-y-2 text-xs">
-          <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-text-secondary">Vector Database</span>
-            <span className="font-mono font-semibold text-text-primary">
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between items-center p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-text-secondary font-medium">Vector Database</span>
+            <span className="font-mono font-bold text-text-primary">
               Qdrant Embedded ({storage?.vector_path})
             </span>
           </div>
-          <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-border">
-            <span className="text-text-secondary">Relational Database</span>
-            <span className="font-mono font-semibold text-text-primary">
+          <div className="flex justify-between items-center p-4 bg-canvas rounded-xl border border-border">
+            <span className="text-text-secondary font-medium">Relational Database</span>
+            <span className="font-mono font-bold text-text-primary">
               {storage?.database_url}
             </span>
           </div>

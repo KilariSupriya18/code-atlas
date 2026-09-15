@@ -42,31 +42,32 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
   return (
     <div className="flex flex-col h-full bg-white border-l border-border shadow-sm">
       {/* Top Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-slate-50/50">
-        <div className="flex items-center space-x-2 truncate">
-          <Code2 className="w-4 h-4 text-primary shrink-0" />
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-border bg-slate-50/70 shrink-0">
+        <div className="flex items-center space-x-2.5 truncate">
+          <Code2 className="w-4 h-4 text-indigo shrink-0" />
           <div className="truncate">
-            <div className="flex items-center space-x-2 text-xs font-mono text-text-primary font-medium">
+            <div className="flex items-center space-x-2 text-[14px] font-mono text-text-primary font-medium">
               <span className="truncate">{filePath}</span>
-              <span className="text-text-secondary">
+              <span className="px-2 py-0.5 rounded bg-indigo-tint text-indigo font-mono text-[12px] font-semibold">
                 L{startLine}–L{endLine}
               </span>
             </div>
             {symbolName && (
-              <div className="text-[11px] text-primary font-mono truncate">
-                {symbolName}
+              <div className="text-[12px] text-indigo font-mono truncate mt-0.5">
+                symbol: {symbolName}
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center space-x-1 shrink-0 ml-2">
+        <div className="flex items-center space-x-1.5 shrink-0 ml-3">
           <button
             onClick={handleCopy}
-            className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-slate-100 rounded transition-colors text-xs flex items-center gap-1"
+            className="h-8 px-2.5 text-text-secondary hover:text-text-primary hover:bg-slate-200/60 rounded-lg transition-colors text-[13px] flex items-center gap-1.5"
             title="Copy Snippet"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-success" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-teal" /> : <Copy className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
           </button>
 
           {githubUrl && (
@@ -74,17 +75,17 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
               href={githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-slate-100 rounded transition-colors"
+              className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-slate-200/60 rounded-lg transition-colors"
               title="Open in GitHub"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-4 h-4" />
             </a>
           )}
 
           {onClose && (
             <button
               onClick={onClose}
-              className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-slate-100 rounded transition-colors"
+              className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-slate-200/60 rounded-lg transition-colors ml-1"
               title="Close Viewer"
             >
               <X className="w-4 h-4" />
@@ -97,7 +98,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
       <div className="flex-1 relative overflow-hidden bg-white">
         <Suspense
           fallback={
-            <div className="p-4 font-mono text-xs text-text-secondary bg-slate-50 h-full overflow-auto">
+            <div className="p-6 font-mono text-[14px] text-text-secondary bg-slate-50 h-full overflow-auto leading-relaxed">
               <pre>{content}</pre>
             </div>
           }
@@ -109,14 +110,16 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
             theme="vs"
             options={{
               readOnly: true,
-              fontSize: 12,
-              fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+              fontSize: 14,
+              lineHeight: 22,
+              fontFamily: "'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace",
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               renderLineHighlight: 'all',
               lineNumbers: 'on',
               folding: true,
               wordWrap: 'on',
+              padding: { top: 12, bottom: 12 },
             }}
             onMount={(editor) => {
               // Center view on targeted startLine
@@ -134,7 +137,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
                       },
                       options: {
                         isWholeLine: true,
-                        className: 'bg-primary-light/60 border-l-2 border-primary',
+                        className: 'bg-indigo-tint/70 border-l-2 border-indigo',
                       },
                     },
                   ]
