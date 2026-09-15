@@ -1,6 +1,7 @@
 import os
 import uuid
 import logging
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -251,7 +252,7 @@ async def get_repository_progress(repo_id: str, db: AsyncSession = Depends(get_d
             concepts_to_revisit=[],
             total_lessons=0,
             demonstrated_count=0,
-            updated_at=datetime.utcnow()
+            updated_at=datetime.now(timezone.utc)
         )
 
     outcomes = prog.exercise_outcomes or {}
