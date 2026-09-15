@@ -1,0 +1,6 @@
+{
+  "name": "CodeMentor",
+  "description": "Codebase RAG & Adaptive Onboarding Platform with interactive architecture exploration and verified code citations",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
